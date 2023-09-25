@@ -20,9 +20,11 @@ const types_1 = require("./types");
 const queries_1 = require("./queries");
 const resolvers_1 = require("./resolvers");
 const mutations_1 = require("./mutations");
+const helmet_1 = __importDefault(require("helmet"));
 const startGraphqlServer = () => __awaiter(void 0, void 0, void 0, function* () {
     const app = (0, express_1.default)();
     app.use(express_1.default.json());
+    app.use((0, helmet_1.default)());
     // app.use(morgan("combined"));
     const graphqlServer = new server_1.ApolloServer({
         typeDefs: `

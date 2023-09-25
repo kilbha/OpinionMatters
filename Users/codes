@@ -1,0 +1,12 @@
+
+install ubuntu from microsoft store.
+
+enable wsl2.
+
+sudo snap install redis
+
+sudo systemctl start snap.redis.server
+
+sudo systemctl status snap.redis.server
+
+sudo systemctl stop snap.redis.server
