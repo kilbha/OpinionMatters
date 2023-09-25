@@ -5,6 +5,7 @@ import { types } from "./types";
 import { queries } from "./queries";
 import { resolvers } from "./resolvers";
 import { mutations } from "./mutations";
+import { input } from "./inputs";
 import helmet from "helmet";
 
 import morgan from "morgan";
@@ -13,7 +14,7 @@ export const startGraphqlServer = async () => {
   const app = express();
 
   app.use(express.json());
-  app.use(helmet());
+  // app.use(helmet());
   // app.use(morgan("combined"));
   const graphqlServer = new ApolloServer<any>({
     typeDefs: `
@@ -22,12 +23,9 @@ export const startGraphqlServer = async () => {
       ${queries}
 
       ${mutations}
+      
+      ${input}
 
-      input CreateUserInput {
-        firstName: String!
-        lastName: String
-        email: String!
-      }
       `,
     resolvers: {
       Query: {

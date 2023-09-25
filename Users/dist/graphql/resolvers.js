@@ -16,6 +16,8 @@ exports.resolvers = void 0;
 const prisma_1 = __importDefault(require("../db/prisma"));
 const { ApolloError } = require("apollo-server-errors");
 const redis_1 = __importDefault(require("../redis/redis"));
+const emailService_1 = __importDefault(require("../services/emailService"));
+const emailservice = new emailService_1.default();
 exports.resolvers = {
     queries: {
         getAllUsers: () => __awaiter(void 0, void 0, void 0, function* () {
@@ -50,6 +52,18 @@ exports.resolvers = {
                 data: user,
             });
             return createdUser;
+        }),
+        send_signup_email: (parent, args) => __awaiter(void 0, void 0, void 0, function* () {
+            const { input } = args;
+            const { toEmail, subject, html, role, exp } = input;
+            let messageId = yield emailservice.send_email([toEmail], html, subject, role, exp);
+            if (messageId) {
+                return messageId;
+            }
+            else {
+                throw new Error("Error in sending signup email");
+            }
+            return "Hi";
         }),
     },
 };
