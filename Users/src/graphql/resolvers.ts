@@ -2,6 +2,10 @@ import prisma from "../db/prisma";
 import { User } from "../models/User";
 const { ApolloError } = require("apollo-server-errors");
 import redisClient from "../redis/redis";
+import { signupInput } from "../models/signupInput";
+import emailService from "../services/emailService";
+
+const emailservice = new emailService();
 
 export const resolvers = {
   queries: {
@@ -36,6 +40,25 @@ export const resolvers = {
         data: user,
       });
       return createdUser;
+    },
+    send_signup_email: async (parent: any, args: { input: signupInput }) => {
+      const { input } = args;
+      const { toEmail, subject, html, role, exp } = input;
+      let messageId = await emailservice.send_email(
+        [toEmail],
+        html,
+        subject,
+        role,
+        exp
+      );
+
+      if (messageId) {
+        return messageId;
+      } else {
+        throw new Error("Error in sending signup email");
+      }
+
+      return "Hi";
     },
   },
 };
