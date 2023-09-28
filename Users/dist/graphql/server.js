@@ -27,7 +27,7 @@ const startGraphqlServer = () => __awaiter(void 0, void 0, void 0, function* () 
     // app.use(helmet());
     // app.use(morgan("combined"));
     const graphqlServer = new server_1.ApolloServer({
-        typeDefs: `
+        typeDefs: `           
       ${types_1.types}
     
       ${queries_1.queries}

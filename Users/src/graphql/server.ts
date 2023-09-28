@@ -6,6 +6,7 @@ import { queries } from "./queries";
 import { resolvers } from "./resolvers";
 import { mutations } from "./mutations";
 import { input } from "./inputs";
+import { errors } from "./errors";
 import helmet from "helmet";
 
 import morgan from "morgan";
@@ -17,7 +18,7 @@ export const startGraphqlServer = async () => {
   // app.use(helmet());
   // app.use(morgan("combined"));
   const graphqlServer = new ApolloServer<any>({
-    typeDefs: `
+    typeDefs: `           
       ${types}
     
       ${queries}

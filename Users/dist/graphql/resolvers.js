@@ -17,7 +17,9 @@ const prisma_1 = __importDefault(require("../db/prisma"));
 const { ApolloError } = require("apollo-server-errors");
 const redis_1 = __importDefault(require("../redis/redis"));
 const emailService_1 = __importDefault(require("../services/emailService"));
+const validator_1 = __importDefault(require("../services/validator"));
 const emailservice = new emailService_1.default();
+const validator = new validator_1.default();
 exports.resolvers = {
     queries: {
         getAllUsers: () => __awaiter(void 0, void 0, void 0, function* () {
@@ -47,11 +49,33 @@ exports.resolvers = {
     },
     mutations: {
         createUser: (parent, args) => __awaiter(void 0, void 0, void 0, function* () {
-            const { user } = args;
-            const createdUser = yield prisma_1.default.user.create({
-                data: user,
-            });
-            return createdUser;
+            try {
+                const { email, password } = args;
+                //EMAIL VALIDATION
+                if (!validator.is_valid_email(email)) {
+                    return {
+                        errors: {
+                            message: "Please provide valild email id",
+                            status_code: 400,
+                        },
+                        user: null,
+                    };
+                }
+                const ExistingUser = yield prisma_1.default.user.findUnique({ where: { email } });
+                if (ExistingUser) {
+                    return {
+                        errors: { message: "Email Already Exists", status_code: 400 },
+                        user: null,
+                    };
+                }
+                const createdUser = yield prisma_1.default.user.create({
+                    data: { email, password },
+                });
+                return { user: createdUser, errors: null };
+            }
+            catch (error) {
+                throw new Error();
+            }
         }),
         send_signup_email: (parent, args) => __awaiter(void 0, void 0, void 0, function* () {
             const { input } = args;
