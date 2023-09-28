@@ -11,9 +11,11 @@ exports.input = `
     }
 
     input CreateUserInput {
-        firstName: String!
+        firstName: String
         lastName: String
         email: String!
+        password: String!
     }   
 
   `;
+//! means non nullable field

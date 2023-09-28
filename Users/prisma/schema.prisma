@@ -13,7 +13,10 @@ datasource db {
 
 model User {
   id String @id @default(cuid())
-  firstName String
+  firstName String?
   lastName String?
-  email String?
+  email String @unique
+  password String
 }
+
+// ? means optional field

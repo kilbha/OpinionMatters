@@ -4,8 +4,10 @@ const { ApolloError } = require("apollo-server-errors");
 import redisClient from "../redis/redis";
 import { signupInput } from "../models/signupInput";
 import emailService from "../services/emailService";
+import Validators from "../services/validator";
 
 const emailservice = new emailService();
+const validator = new Validators();
 
 export const resolvers = {
   queries: {
@@ -34,12 +36,40 @@ export const resolvers = {
     },
   },
   mutations: {
-    createUser: async (parent: any, args: { user: User }) => {
-      const { user } = args;
-      const createdUser = await prisma.user.create({
-        data: user,
-      });
-      return createdUser;
+    createUser: async (
+      parent: any,
+      args: {
+        email: string;
+        password: string;
+      }
+    ) => {
+      try {
+        const { email, password } = args;
+        //EMAIL VALIDATION
+        if (!validator.is_valid_email(email)) {
+          return {
+            errors: {
+              message: "Please provide valild email id",
+              status_code: 400,
+            },
+            user: null,
+          };
+        }
+
+        const ExistingUser = await prisma.user.findUnique({ where: { email } });
+        if (ExistingUser) {
+          return {
+            errors: { message: "Email Already Exists", status_code: 400 },
+            user: null,
+          };
+        }
+        const createdUser = await prisma.user.create({
+          data: { email, password },
+        });
+        return { user: createdUser, errors: null };
+      } catch (error) {
+        throw new Error();
+      }
     },
     send_signup_email: async (parent: any, args: { input: signupInput }) => {
       const { input } = args;
