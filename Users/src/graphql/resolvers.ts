@@ -1,13 +1,13 @@
 import prisma from "../db/prisma";
-import { User } from "../models/User";
-const { ApolloError } = require("apollo-server-errors");
 import redisClient from "../redis/redis";
 import { signupInput } from "../models/signupInput";
 import emailService from "../services/emailService";
 import Validators from "../services/validator";
+import Utils from "../services/utilsService";
 
 const emailservice = new emailService();
 const validator = new Validators();
+const utils = new Utils();
 
 export const resolvers = {
   queries: {
@@ -45,6 +45,7 @@ export const resolvers = {
     ) => {
       try {
         const { email, password } = args;
+
         //EMAIL VALIDATION
         if (!validator.is_valid_email(email)) {
           return {
@@ -57,14 +58,16 @@ export const resolvers = {
         }
 
         const ExistingUser = await prisma.user.findUnique({ where: { email } });
+
         if (ExistingUser) {
           return {
             errors: { message: "Email Already Exists", status_code: 400 },
             user: null,
           };
         }
+        let pwd = await utils.hash_password(password);
         const createdUser = await prisma.user.create({
-          data: { email, password },
+          data: { email: email, password: pwd },
         });
         return { user: createdUser, errors: null };
       } catch (error) {

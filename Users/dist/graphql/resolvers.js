@@ -14,12 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.resolvers = void 0;
 const prisma_1 = __importDefault(require("../db/prisma"));
-const { ApolloError } = require("apollo-server-errors");
 const redis_1 = __importDefault(require("../redis/redis"));
 const emailService_1 = __importDefault(require("../services/emailService"));
 const validator_1 = __importDefault(require("../services/validator"));
+const utilsService_1 = __importDefault(require("../services/utilsService"));
 const emailservice = new emailService_1.default();
 const validator = new validator_1.default();
+const utils = new utilsService_1.default();
 exports.resolvers = {
     queries: {
         getAllUsers: () => __awaiter(void 0, void 0, void 0, function* () {
@@ -68,8 +69,9 @@ exports.resolvers = {
                         user: null,
                     };
                 }
+                let pwd = yield utils.hash_password(password);
                 const createdUser = yield prisma_1.default.user.create({
-                    data: { email, password },
+                    data: { email: email, password: pwd },
                 });
                 return { user: createdUser, errors: null };
             }
