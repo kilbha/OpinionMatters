@@ -21,8 +21,13 @@ const queries_1 = require("./queries");
 const resolvers_1 = require("./resolvers");
 const mutations_1 = require("./mutations");
 const inputs_1 = require("./inputs");
+const cors_1 = __importDefault(require("cors"));
 const startGraphqlServer = () => __awaiter(void 0, void 0, void 0, function* () {
+    const corsOptions = {
+        origin: ["http://localhost:3000"],
+    };
     const app = (0, express_1.default)();
+    app.use((0, cors_1.default)(corsOptions));
     app.use(express_1.default.json());
     // app.use(helmet());
     // app.use(morgan("combined"));
